@@ -99,6 +99,7 @@ trait SearchTrait {
 	/**
 	 * Дополнительные операции с запросом
 	 *
+	 * @param $params Array
 	 * @param $query Query
 	 * @param $dataProvider ActiveDataProvider
 	 */
