@@ -102,7 +102,7 @@ trait SearchTrait {
 	 * @param $query Query
 	 * @param $dataProvider ActiveDataProvider
 	 */
-	public function processFilterQuery($query, $dataProvider) {
+	public function processFilterQuery($params, $query, $dataProvider) {
 	}
 
 	public static function forSearch($params = [], $formName = false) {
