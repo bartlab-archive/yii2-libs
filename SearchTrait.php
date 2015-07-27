@@ -107,7 +107,7 @@ trait SearchTrait {
 	}
 
 	public static function forSearch($params = [], $formName = false) {
-		return (new self)->search($params, $formName);
+		return (new static)->search($params, $formName);
 	}
 
 	/**
