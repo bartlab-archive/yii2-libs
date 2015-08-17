@@ -6,12 +6,14 @@ use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\db\ActiveRecord;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 use yii\validators\Validator;
 
 /**
  * Class AdditionsTrait
  *
  * @property array $validators
+ *
  * @package maybeworks\libs
  */
 trait SearchTrait {
@@ -36,48 +38,98 @@ trait SearchTrait {
 	public $pageSize = false;// = 20;
 
 	public function searchInit() {
-		$this->validators[] = Validator::createValidator('safe', $this, ['filterText', 'filterTextField'], ['on' => 'search']);
-		$this->validators[] = Validator::createValidator('default', $this, ['pageSize'], ['on' => 'search']);
+		$this->validators[] = Validator::createValidator(
+			'default',
+			$this,
+			['filterText', 'filterTextField'],
+			['on' => 'search']
+		);
+
+		$this->validators[] = Validator::createValidator(
+			'default',
+			$this,
+			['pageSize'],
+			['on' => 'search']
+		);
 
 		// todo: проверить корректность работы
-		$this->validators[] = Validator::createValidator('safe', $this, $this->filterLikeAttributes(), ['on' => 'search']);
-		$this->validators[] = Validator::createValidator('safe', $this, $this->filterAttributes(), ['on' => 'search']);
+		$this->validators[] = Validator::createValidator(
+			'safe',
+			$this,
+			$this->filterLikeAttributes(),
+			['on' => 'search']
+		);
+
+		$this->validators[] = Validator::createValidator(
+			'safe',
+			$this,
+			$this->filterAttributes(),
+			['on' => 'search']
+		);
 	}
 
 	/**
 	 * Имя класса дата-провайдера
 	 * @return string
 	 */
-	public function getDataProviderClassName() {
+	public function dataProviderClassName() {
 		return ActiveDataProvider::className();
 	}
 
-	public function getPaginationClassName() {
+	/**
+	 * Имя класса пагинатора
+	 * @return string
+	 */
+	public function paginationClassName() {
 		return Pagination::className();
 	}
 
 	/**
 	 * Получение DataProvider
+	 *
+	 * @param array $options [опционально] опции для DataProvider
+	 *
 	 * @return \yii\data\ActiveDataProvider
 	 */
-	public function getDataProvider() {
-
-		return new $this->dataProviderClassName(
-			[
-				'query' => static::find(),
-				'sort' => [
-					'defaultOrder' => [
-						'id' => SORT_ASC
-					]
+	public function dataProvider($options = []) {
+		return \Yii::createObject(
+			$this->dataProviderClassName(),
+			ArrayHelper::merge(
+				[
+					'query' => static::find(),
+					'sort' => isset($options['sort']) ?: $this->sortOptions(),
+					'pagination' => isset($options['pagination']) ?: $this->pagination()
 				],
-				'pagination' => new $this->paginationClassName(
-					[
-						'pageSize' => $this->pageSize,
-						'defaultPageSize' => $this->pageSize,
-					]
-				)
+				$options
+			)
+		);
+	}
+
+	/**
+	 * Получения пагинатора
+	 * @return Pagination
+	 * @throws \yii\base\InvalidConfigException
+	 */
+	public function pagination() {
+		return \Yii::createObject(
+			$this->paginationClassName(),
+			[
+				'pageSize' => $this->pageSize,
+				'defaultPageSize' => $this->pageSize,
 			]
 		);
+	}
+
+	/**
+	 * Получения параметров сортировки
+	 * @return array
+	 */
+	public function sortOptions() {
+		return [
+			'defaultOrder' => [
+				'id' => SORT_ASC
+			]
+		];
 	}
 
 	/**
@@ -108,24 +160,27 @@ trait SearchTrait {
 
 	/**
 	 * Прокси к методу search
+	 *
 	 * @param array $params массив значений
-	 * @param bool|false $formName [опционально] имя формы для метода load
+	 * @param bool|string $formName [опционально] имя формы для метода load
+	 * @param array $options [опционально] дополнительные параметры
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public static function forSearch($params = [], $formName = false) {
-		return (new static)->search($params, $formName);
+	public static function forSearch($params = [], $formName = false, $options = []) {
+		return (new static)->search($params, $formName, $options);
 	}
 
 	/**
 	 * Выборка строк на основе полученных данных
 	 *
 	 * @param $params array массив значений, который будет передан в метод load
-	 * @param null|string $formName [опционально] имя формы для метода load
+	 * @param bool|string $formName [опционально] имя формы для метода load
+	 * @param array $options [опционально] дополнительные параметры
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params = [], $formName = null) {
+	public function search($params = [], $formName = false, $options = []) {
 		/**
 		 * @var $query Query
 		 * @var $model ActiveRecord
@@ -143,7 +198,7 @@ trait SearchTrait {
 		/**
 		 * Создаём DataProvider, указываем ему запрос, настраиваем пагинацию
 		 */
-		$dataProvider = $this->dataProvider;
+		$dataProvider = $this->dataProvider($options);
 		$query = $dataProvider->query;
 
 		// загружаем и проверяем данные перед фильтрацией
