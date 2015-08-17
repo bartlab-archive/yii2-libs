@@ -2,6 +2,7 @@
 
 namespace maybeworks\libs;
 
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\db\ActiveRecord;
@@ -91,18 +92,30 @@ trait SearchTrait {
 	 *
 	 * @return \yii\data\ActiveDataProvider
 	 */
+	/**
+	 * @param array $options
+	 *
+	 * @return object
+	 * @throws InvalidConfigException
+	 */
 	public function dataProvider($options = []) {
-		return \Yii::createObject(
-			$this->dataProviderClassName(),
-			ArrayHelper::merge(
-				[
-					'query' => static::find(),
-					'sort' => isset($options['sort']) ?: $this->sortOptions(),
-					'pagination' => isset($options['pagination']) ?: $this->pagination()
-				],
-				$options
-			)
-		);
+		if (!is_array($options)){
+			throw new InvalidConfigException('Object configuration must be an array');
+		}
+		if (!isset($options['class'])) {
+			$options['class'] = $this->dataProviderClassName();
+		}
+		if (!isset($options['sort'])) {
+			$options['sort'] = $this->sortOptions();
+		}
+		if (!isset($options['pagination'])) {
+			$options['pagination'] = $this->pagination();
+		}
+		if (!isset($options['query'])) {
+			$options['query'] = static::find();
+		}
+
+		return \Yii::createObject($options);
 	}
 
 	/**
@@ -112,8 +125,8 @@ trait SearchTrait {
 	 */
 	public function pagination() {
 		return \Yii::createObject(
-			$this->paginationClassName(),
 			[
+				'class'=>$this->paginationClassName(),
 				'pageSize' => $this->pageSize,
 				'defaultPageSize' => $this->pageSize,
 			]
