@@ -106,6 +106,13 @@ trait SearchTrait {
 	public function processFilterQuery($params, $query, $dataProvider) {
 	}
 
+	/**
+	 * Прокси к методу search
+	 * @param array $params массив значений
+	 * @param bool|false $formName [опционально] имя формы для метода load
+	 *
+	 * @return ActiveDataProvider
+	 */
 	public static function forSearch($params = [], $formName = false) {
 		return (new static)->search($params, $formName);
 	}
