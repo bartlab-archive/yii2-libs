@@ -106,7 +106,11 @@ trait SearchTrait {
 			$options['class'] = $this->dataProviderClassName();
 		}
 		if (!isset($options['sort'])) {
-			$options['sort'] = $this->sortOptions();
+			$options['sort'] = [
+				'defaultOrder' => [
+					'id' => SORT_ASC
+				]
+			];
 		}
 		if (!isset($options['pagination'])) {
 			$options['pagination'] = $this->pagination();
@@ -137,12 +141,19 @@ trait SearchTrait {
 	 * Получения параметров сортировки
 	 * @return array
 	 */
-	public function sortOptions() {
-		return [
-			'defaultOrder' => [
-				'id' => SORT_ASC
+	public function sort() {
+		return \Yii::createObject(
+			[
+				'class'=>$this->paginationClassName(),
+				'pageSize' => $this->pageSize,
+				'defaultPageSize' => $this->pageSize,
 			]
-		];
+		);
+//		return [
+//			'defaultOrder' => [
+//				'id' => SORT_ASC
+//			]
+//		];
 	}
 
 	/**
