@@ -120,7 +120,14 @@ trait SearchTrait {
 			'sort' => isset($options['sort']) ? $options['sort'] : $this->sort(),
 		];
 
-		return \Yii::createObject($config);
+		unset(
+			$options['class'],
+			$options['query'],
+			$options['pagination'],
+			$options['sort']
+		);
+
+		return \Yii::createObject(array_merge($config,$options));
 	}
 
 	/**
