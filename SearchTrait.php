@@ -5,6 +5,7 @@ namespace maybeworks\libs;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
+use yii\data\Sort;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -86,6 +87,14 @@ trait SearchTrait {
 	}
 
 	/**
+	 * Имя класса сортировки
+	 * @return string
+	 */
+	public function sortClassName() {
+		return Sort::className();
+	}
+
+	/**
 	 * Получение DataProvider
 	 *
 	 * @param array $options [опционально] опции для DataProvider
@@ -99,27 +108,19 @@ trait SearchTrait {
 	 * @throws InvalidConfigException
 	 */
 	public function dataProvider($options = []) {
-		if (!is_array($options)){
+
+		if (!is_array($options)) {
 			throw new InvalidConfigException('Object configuration must be an array');
 		}
-		if (!isset($options['class'])) {
-			$options['class'] = $this->dataProviderClassName();
-		}
-		if (!isset($options['sort'])) {
-			$options['sort'] = [
-				'defaultOrder' => [
-					'id' => SORT_ASC
-				]
-			];
-		}
-		if (!isset($options['pagination'])) {
-			$options['pagination'] = $this->pagination();
-		}
-		if (!isset($options['query'])) {
-			$options['query'] = static::find();
-		}
 
-		return \Yii::createObject($options);
+		$config = [
+			'class' => isset($options['class']) ? $options['class'] : $this->dataProviderClassName(),
+			'query' => isset($options['query']) ? $options['query'] : static::find(),
+			'pagination' => isset($options['pagination']) ? $options['pagination'] : $this->pagination(),
+			'sort' => isset($options['sort']) ? $options['sort'] : $this->sort(),
+		];
+
+		return \Yii::createObject($config);
 	}
 
 	/**
@@ -130,7 +131,7 @@ trait SearchTrait {
 	public function pagination() {
 		return \Yii::createObject(
 			[
-				'class'=>$this->paginationClassName(),
+				'class' => $this->paginationClassName(),
 				'pageSize' => $this->pageSize,
 				'defaultPageSize' => $this->pageSize,
 			]
@@ -139,14 +140,15 @@ trait SearchTrait {
 
 	/**
 	 * Получения параметров сортировки
-	 * @return array
+	 * @return Sort
 	 */
 	public function sort() {
 		return \Yii::createObject(
 			[
-				'class'=>$this->paginationClassName(),
-				'pageSize' => $this->pageSize,
-				'defaultPageSize' => $this->pageSize,
+				'class' => $this->sortClassName(),
+				'defaultOrder' => [
+					'id' => SORT_ASC
+				]
 			]
 		);
 //		return [
