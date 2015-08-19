@@ -2,7 +2,7 @@
 
 namespace maybeworks\libs;
 
-use yii\db\ActiveRecord;
+//use yii\db\ActiveRecord;
 
 /**
  * Class AdditionsTrait

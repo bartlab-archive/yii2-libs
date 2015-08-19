@@ -1,9 +1,7 @@
 <?php
 
-namespace common\db;
+namespace maybeworks\libs;
 
-use maybeworks\libs\AdditionsTrait;
-use maybeworks\libs\SearchTrait;
 use Yii;
 
 class ActiveRecord extends \yii\db\ActiveRecord {

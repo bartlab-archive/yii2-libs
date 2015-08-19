@@ -1,8 +1,7 @@
 <?php
 
-namespace common\db;
+namespace maybeworks\libs;
 
-use yii\db\ActiveQueryInterface;
 use yii\helpers\ArrayHelper;
 
 class ActiveQuery extends \yii\db\ActiveQuery {
