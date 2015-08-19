@@ -46,7 +46,6 @@ trait AdditionsTrait {
 	public static function getItem($id = null) {
 		if ($id) {
 			$item = static::findOne($id);
-//			$item = static::findOne($id);
 			$scenario = 'update';
 		} else {
 			$item = new static();

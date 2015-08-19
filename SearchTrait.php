@@ -39,7 +39,7 @@ trait SearchTrait {
 	 */
 	public $pageSize = false;// = 20;
 
-	public function searchInit() {
+	public function SearchTraitInit() {
 		$this->validators[] = Validator::createValidator(
 			'default',
 			$this,
