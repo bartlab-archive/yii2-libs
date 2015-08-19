@@ -65,12 +65,8 @@ trait AdditionsTrait {
 		if($model = self::find()->where($arguments)->one()){
 			return $model;
 		}
-
-
-		$model = new static();
-		if ($model && array_key_exists('insert', $model->scenarios())) {
-			$model->setScenario('insert');
-		}
+		
+		$model = self::getItem();
 		$model->setAttributes($arguments);
 
 		if($save){
