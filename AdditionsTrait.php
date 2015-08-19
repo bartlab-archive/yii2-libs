@@ -59,4 +59,24 @@ trait AdditionsTrait {
 
 		return $item;
 	}
+
+	public static function findOrCreate($arguments = [], $save = false){
+		/** @var $model ActiveRecord */
+		if($model = self::find()->where($arguments)->one()){
+			return $model;
+		}
+
+
+		$model = new static();
+		if ($model && array_key_exists('insert', $model->scenarios())) {
+			$model->setScenario('insert');
+		}
+		$model->setAttributes($arguments);
+
+		if($save){
+			$model->save();
+		}
+
+		return $model;
+	}
 }
