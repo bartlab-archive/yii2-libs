@@ -14,7 +14,7 @@ trait AdditionsTrait {
 
 	/**
 	 * Создание копии записи на основе существующей
-	 * @return ActiveRecord
+	 * @return static
 	 */
 	public function getCopy() {
 		/**
@@ -41,7 +41,7 @@ trait AdditionsTrait {
 	/**
 	 * Получить запись по id или создать новый экземпляр класса АР (если id = null)
 	 * @param $id [опционально] id записи (по умолчанию null)
-	 * @return ActiveRecord если указан id, но запись не найдена, вернет null
+	 * @return static если указан id, но запись не найдена, вернет null
 	 */
 	public static function getItem($id = null) {
 		if ($id) {
@@ -60,6 +60,12 @@ trait AdditionsTrait {
 		return $item;
 	}
 
+	/**
+	 * Получаем массив параметров для поиска, если нашли - возвращаем найденую модель, в противном случае создаем модель с параметрами поиска
+	 * @param $arguments
+	 * @param $save [default false] если true - сохраняет новую запись. проверяйте hasErrors у полученной модели
+	 * @return static
+	 */
 	public static function findOrCreate($arguments = [], $save = false){
 		/** @var $model ActiveRecord */
 		if($model = self::find()->where($arguments)->one()){
