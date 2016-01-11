@@ -4,7 +4,7 @@ namespace maybeworks\libs;
 
 interface SearchInterface {
 
-	const EVENT_PROCCESS_FILTER = 'proccessFilter';
+	const EVENT_PROCESS_FILTER = 'processFilter';
 
 	public function search($params = [], $formName = false, $options = []);
 
