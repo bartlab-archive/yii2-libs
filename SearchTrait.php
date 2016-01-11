@@ -97,15 +97,10 @@ trait SearchTrait {
 
 	/**
 	 * Получение DataProvider
-	 *
+	 * 
 	 * @param array $options [опционально] опции для DataProvider
 	 *
 	 * @return \yii\data\ActiveDataProvider
-	 */
-	/**
-	 * @param array $options
-	 *
-	 * @return object
 	 * @throws InvalidConfigException
 	 */
 	public function dataProvider($options = []) {
