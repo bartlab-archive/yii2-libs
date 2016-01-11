@@ -7,9 +7,7 @@ use yii\base\ModelEvent;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
-//use yii\db\ActiveRecord;
 use yii\db\Query;
-//use yii\helpers\ArrayHelper;
 use yii\validators\Validator;
 
 /**
@@ -188,7 +186,7 @@ trait SearchTrait {
 	 */
 	public function processFilterQuery($params, $query, $dataProvider) {
 		$this->trigger(
-			self::EVENT_PROCCESS_FILTER,
+			self::EVENT_PROCESS_FILTER,
 			new ProcessFilterEvent(
 				[
 					'params' => $params,
