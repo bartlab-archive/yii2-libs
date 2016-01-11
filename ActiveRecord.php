@@ -4,7 +4,7 @@ namespace maybeworks\libs;
 
 use Yii;
 
-class ActiveRecord extends \yii\db\ActiveRecord {
+class ActiveRecord extends \yii\db\ActiveRecord implements SearchInterface {
 	use AdditionsTrait, SearchTrait;
 
 	public function init() {
@@ -20,11 +20,11 @@ class ActiveRecord extends \yii\db\ActiveRecord {
 			$traits = array_merge(class_uses($trait), $traits);
 		}
 
-		foreach(array_unique($traits) as $trait){
+		foreach (array_unique($traits) as $trait) {
 			$rc = new \ReflectionClass($trait);
-			$methodName = $rc->getShortName().'Init';
-			if ($rc->hasMethod($methodName)){
-				call_user_func([$this,$methodName]);
+			$methodName = $rc->getShortName() . 'Init';
+			if ($rc->hasMethod($methodName)) {
+				call_user_func([$this, $methodName]);
 			}
 		}
 	}

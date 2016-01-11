@@ -3,6 +3,7 @@
 namespace maybeworks\libs;
 
 use yii\base\InvalidConfigException;
+use yii\base\ModelEvent;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
@@ -127,7 +128,7 @@ trait SearchTrait {
 			$options['sort']
 		);
 
-		return \Yii::createObject(array_merge($config,$options));
+		return \Yii::createObject(array_merge($config, $options));
 	}
 
 	/**
@@ -184,11 +185,23 @@ trait SearchTrait {
 	/**
 	 * Дополнительные операции с запросом
 	 *
-	 * @param $params Array
+	 * @param $params array
 	 * @param $query Query
 	 * @param $dataProvider ActiveDataProvider
+	 *
+	 * @return bool
 	 */
 	public function processFilterQuery($params, $query, $dataProvider) {
+		$this->trigger(
+			self::EVENT_PROCCESS_FILTER,
+			new ProcessFilterEvent(
+				[
+					'params' => $params,
+					'query' => $query,
+					'dataProvider' => $dataProvider
+				]
+			)
+		);
 	}
 
 	/**
@@ -207,7 +220,7 @@ trait SearchTrait {
 	/**
 	 * Выборка строк на основе полученных данных
 	 *
-	 * @param $params array массив значений, который будет передан в метод load
+	 * @param array $params array массив значений, который будет передан в метод load
 	 * @param bool|string $formName [опционально] имя формы для метода load
 	 * @param array $options [опционально] дополнительные параметры
 	 *
@@ -230,6 +243,7 @@ trait SearchTrait {
 
 		/**
 		 * Создаём DataProvider, указываем ему запрос, настраиваем пагинацию
+		 * @var $dataProvider ActiveDataProvider
 		 */
 		$dataProvider = $this->dataProvider($options);
 		$query = $dataProvider->query;
