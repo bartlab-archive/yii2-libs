@@ -4,7 +4,6 @@ namespace maybeworks\libs;
 
 use yii\base\Event;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 
 class ProcessFilterEvent extends Event {
 
@@ -14,7 +13,7 @@ class ProcessFilterEvent extends Event {
 	public $params;
 
 	/**
-	 * @var ActiveQuery
+	 * @var \yii\db\ActiveQuery
 	 */
 	public $query;
 
