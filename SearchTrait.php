@@ -15,7 +15,6 @@ use yii\validators\Validator;
  */
 trait SearchTrait
 {
-
     /**
      * Значение для поиска по всем текстовым аттрибутам или только в указанном filter_text_field
      * @var string
@@ -34,157 +33,6 @@ trait SearchTrait
      * @var bool|int
      */
     public $pageSize = false;// = 20;
-
-    public function createValidators()
-    {
-        /** @var $validators \ArrayObject */
-        $validators = parent::createValidators();
-
-        $validators->append(Validator::createValidator(
-            'default',
-            $this,
-            array_merge(
-                ['pageSize', 'filterText', 'filterTextField'],
-                $this->filterLikeAttributes(),
-                $this->filterAttributes()
-            ),
-            ['on' => 'search']
-        ));
-
-        return $validators;
-    }
-
-    /**
-     * Имя класса дата-провайдера
-     * @return string
-     */
-    public function dataProviderClassName()
-    {
-        return ActiveDataProvider::className();
-    }
-
-    /**
-     * Имя класса пагинатора
-     * @return string
-     */
-    public function paginationClassName()
-    {
-        return Pagination::className();
-    }
-
-    /**
-     * Имя класса сортировки
-     * @return string
-     */
-    public function sortClassName()
-    {
-        return Sort::className();
-    }
-
-    /**
-     * Получение DataProvider
-     *
-     * @param array $options [опционально] опции для DataProvider
-     *
-     * @return \yii\data\ActiveDataProvider
-     * @throws InvalidConfigException
-     */
-    public function dataProvider($options = [])
-    {
-
-        if (!is_array($options)) {
-            throw new InvalidConfigException('Object configuration must be an array');
-        }
-
-        $config = [
-            'class' => isset($options['class']) ? $options['class'] : $this->dataProviderClassName(),
-            'query' => isset($options['query']) ? $options['query'] : static::find(),
-            'pagination' => isset($options['pagination']) ? $options['pagination'] : $this->pagination(),
-            'sort' => isset($options['sort']) ? $options['sort'] : $this->sort(),
-        ];
-
-        unset(
-            $options['class'],
-            $options['query'],
-            $options['pagination'],
-            $options['sort']
-        );
-
-        return \Yii::createObject(array_merge($config, $options));
-    }
-
-    /**
-     * Получения пагинатора
-     * @return Pagination
-     * @throws \yii\base\InvalidConfigException
-     */
-    public function pagination()
-    {
-        return \Yii::createObject(
-            [
-                'class' => $this->paginationClassName(),
-                'pageSize' => $this->pageSize,
-                'defaultPageSize' => $this->pageSize,
-            ]
-        );
-    }
-
-    /**
-     * Получения параметров сортировки
-     * @return Sort
-     */
-    public function sort()
-    {
-        return \Yii::createObject(
-            [
-                'class' => $this->sortClassName(),
-                'defaultOrder' => [
-                    'id' => SORT_ASC
-                ]
-            ]
-        );
-    }
-
-    /**
-     * Массив аттрибутов для поиска через LIKE
-     * @return array
-     */
-    public function filterLikeAttributes()
-    {
-        return [];
-    }
-
-    /**
-     * Массив аттрибутов для поиска с точным совпадением
-     * @return array
-     */
-    public function filterAttributes()
-    {
-        return [];
-    }
-
-    /**
-     * Дополнительные операции с запросом
-     *
-     * @param $params array
-     * @param $query Query
-     * @param $dataProvider ActiveDataProvider
-     *
-     * @return bool
-     */
-    public function processFilterQuery($params, $query, $dataProvider)
-    {
-        $this->trigger(
-            self::EVENT_PROCESS_FILTER,
-            new ProcessFilterEvent(
-                [
-                    'params' => $params,
-                    'query' => $query,
-                    'dataProvider' => $dataProvider
-                ]
-            )
-        );
-    }
 
     /**
      * Прокси к методу search
@@ -266,5 +114,156 @@ trait SearchTrait
         }
 
         return $dataProvider;
+    }
+
+    /**
+     * Получение DataProvider
+     *
+     * @param array $options [опционально] опции для DataProvider
+     *
+     * @return \yii\data\ActiveDataProvider
+     * @throws InvalidConfigException
+     */
+    public function dataProvider($options = [])
+    {
+
+        if (!is_array($options)) {
+            throw new InvalidConfigException('Object configuration must be an array');
+        }
+
+        $config = [
+            'class' => isset($options['class']) ? $options['class'] : $this->dataProviderClassName(),
+            'query' => isset($options['query']) ? $options['query'] : static::find(),
+            'pagination' => isset($options['pagination']) ? $options['pagination'] : $this->pagination(),
+            'sort' => isset($options['sort']) ? $options['sort'] : $this->sort(),
+        ];
+
+        unset(
+            $options['class'],
+            $options['query'],
+            $options['pagination'],
+            $options['sort']
+        );
+
+        return \Yii::createObject(array_merge($config, $options));
+    }
+
+    /**
+     * Имя класса дата-провайдера
+     * @return string
+     */
+    public function dataProviderClassName()
+    {
+        return ActiveDataProvider::className();
+    }
+
+    /**
+     * Получения пагинатора
+     * @return Pagination
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function pagination()
+    {
+        return \Yii::createObject(
+            [
+                'class' => $this->paginationClassName(),
+                'pageSize' => $this->pageSize,
+                'defaultPageSize' => $this->pageSize,
+            ]
+        );
+    }
+
+    /**
+     * Имя класса пагинатора
+     * @return string
+     */
+    public function paginationClassName()
+    {
+        return Pagination::className();
+    }
+
+    /**
+     * Получения параметров сортировки
+     * @return Sort
+     */
+    public function sort()
+    {
+        return \Yii::createObject(
+            [
+                'class' => $this->sortClassName(),
+                'defaultOrder' => [
+                    'id' => SORT_ASC
+                ]
+            ]
+        );
+    }
+
+    /**
+     * Имя класса сортировки
+     * @return string
+     */
+    public function sortClassName()
+    {
+        return Sort::className();
+    }
+
+    /**
+     * Массив аттрибутов для поиска с точным совпадением
+     * @return array
+     */
+    public function filterAttributes()
+    {
+        return [];
+    }
+
+    /**
+     * Массив аттрибутов для поиска через LIKE
+     * @return array
+     */
+    public function filterLikeAttributes()
+    {
+        return [];
+    }
+
+    /**
+     * Дополнительные операции с запросом
+     *
+     * @param $params array
+     * @param $query Query
+     * @param $dataProvider ActiveDataProvider
+     *
+     * @return bool
+     */
+    public function processFilterQuery($params, $query, $dataProvider)
+    {
+        $this->trigger(
+            self::EVENT_PROCESS_FILTER,
+            new ProcessFilterEvent(
+                [
+                    'params' => $params,
+                    'query' => $query,
+                    'dataProvider' => $dataProvider
+                ]
+            )
+        );
+    }
+
+    public function createValidators()
+    {
+        /** @var $validators \ArrayObject */
+        $validators = parent::createValidators();
+
+        $validators->append(Validator::createValidator(
+            'default',
+            $this,
+            array_merge(
+                ['pageSize', 'filterText', 'filterTextField'],
+                $this->filterLikeAttributes(),
+                $this->filterAttributes()
+            ),
+            ['on' => 'search']
+        ));
+
+        return $validators;
     }
 }
