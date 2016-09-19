@@ -96,17 +96,22 @@ trait SearchTrait
 
             // ... OR LIKE
             // фильтруем по тестовым данным
-            if ($this->filterText != '' && !empty($like)) {
-                $like = array_map(
-                    function ($value) {
-                        return $value . ' LIKE :text';
-                    },
-                    $like
-                );
-                $query->andWhere(
-                    $this->filterTextField == '' ? '(' . join(' OR ', $like) . ')' : $this->filterTextField . ' LIKE :text',
-                    [':text' => '%' . trim($this->filterText) . '%']
-                );
+            if ($this->filterText && !empty($like)) {
+                $filterText = is_array($this->filterText) ? $this->filterText : (array)$this->filterText;
+
+                foreach ($filterText as $n => $ft) {
+                    $query->andWhere(
+                        $this->filterTextField == '' ?
+                            join(' OR ', array_map(
+                                function ($value) use ($n) {
+                                    return $value . ' LIKE :text' . $n;
+                                },
+                                $like
+                            )) :
+                            $this->filterTextField . ' LIKE :text' . $n,
+                        [':text' . $n => '%' . trim($ft) . '%']
+                    );
+                }
             }
 
             // доп.операции
@@ -121,7 +126,7 @@ trait SearchTrait
      *
      * @param array $options [опционально] опции для DataProvider
      *
-     * @return \yii\data\ActiveDataProvider
+     * @return object|\yii\data\ActiveDataProvider
      * @throws InvalidConfigException
      */
     public function dataProvider($options = [])
@@ -159,7 +164,7 @@ trait SearchTrait
 
     /**
      * Получения пагинатора
-     * @return Pagination
+     * @return object|Pagination
      * @throws \yii\base\InvalidConfigException
      */
     public function pagination()
@@ -184,7 +189,7 @@ trait SearchTrait
 
     /**
      * Получения параметров сортировки
-     * @return Sort
+     * @return object|Sort
      */
     public function sort()
     {
@@ -253,6 +258,7 @@ trait SearchTrait
         /** @var $validators \ArrayObject */
         $validators = parent::createValidators();
 
+        /** @var $this ActiveRecord */
         $validators->append(Validator::createValidator(
             'default',
             $this,
